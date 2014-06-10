@@ -1,4 +1,5 @@
 package BeagleBone::GPIO::Pin;
+my $base='/sys/class/gpio/';
 
 use 5.006;
 use strict;
@@ -28,25 +29,35 @@ Perhaps a little code snippet.
     my $foo = BeagleBone::GPIO::Pin->new();
     ...
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
+=head2 new
 
 =cut
 
-sub function1 {
+sub new {
+    my($proto, $name) = @_;
+    my $index = BeageBone::GPIO::PinNameMap{$name};
+    my $me = {name=>$name, index=>$index};
+    if(! -d $base.'gpio'.$index){
+        open(my $eh, '>', $base.'export') || die "Could not write to export device: $!\n";
+        print $eh $index;
+        close($eh);
+    }
+    return bless($me, $proto);
 }
 
-=head2 function2
+=head2 setMode
 
 =cut
 
-sub function2 {
+sub setMode {
+    my $me = shift;
+    my $mode = shift;
+    open(my $dh, '>', $base.'gpio'.$index.'/direction') || die "Could not write to device direction controll handle: $!\n";
+    print $dh $dir;
+    close($dh);
+    return 1;
 }
 
 =head1 AUTHOR

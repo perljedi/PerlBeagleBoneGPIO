@@ -6,14 +6,6 @@ use warnings FATAL => 'all';
 use base qw(Exporter);
 use vars qw(@EXPORT @EXPORT_OK %EXPORT_TAGS %PinNameMap @PinIndexToNameList);
 
-BEGIN{
-    @EXPORT = qw();
-    @EXPORT_OK = qw(&init %PinNameMap @PinIndexToNameList);
-    %EXPORT_TAGS = (
-        all=>\@EXPORT_OK,
-    );
-}
-
 =head1 NAME
 
 BeagleBone::GPIO - The great new BeagleBone::GPIO!
@@ -41,8 +33,35 @@ Perhaps a little code snippet.
 
 =head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=head2 Variables
+
+=head3 %PinNameMap
+
+This is a map from pin name (i.e. P8_13) to pin index in the device tree overlay.
+
+=head3 @PinIndexToNameList
+
+This is essentially the revers of the PinNameMap, entries at each index in the array map to the 
+pin header names.
+
+=head2 Methods
+
+=item L<&init|/init1>
+
+=item L<&getPinByName|getPinByName1>
+
+=item L<&getPinByIndex|getPinByIndex>
+
+=cut
+
+BEGIN{
+    @EXPORT = qw();
+    @EXPORT_OK = qw(&init %PinNameMap @PinIndexToNameList);
+    %EXPORT_TAGS = (
+        all=>\@EXPORT_OK,
+    );
+}
+
 
 =head1 SUBROUTINES/METHODS
 
@@ -53,19 +72,32 @@ Initialize pin name to index and index to pin name maps
 =cut
 
 sub init{
-    while(<DATA>){
-        chomp;
-        my($name, $index) = split(/\s/);
-        $PinNameMap{$name}=$index;
-        $PinIndexToNameList[$index]=$name;
+    if(scalar(keys %PinNameMap) < 1){
+        while(<DATA>){
+            chomp;
+            my($name, $index) = split(/\s/);
+            $PinNameMap{$name}=$index;
+            $PinIndexToNameList[$index]=$name;
+        }
     }
 }
 
-=head2 function2
+=head2 getPinByName
 
 =cut
 
-sub function2 {
+sub getPinByName {
+    &init();
+    return new BeagleBone::GPIO::Pin(@_);
+}
+
+=head2 getPinByName
+
+=cut
+
+sub getPinByName {
+    &init();
+    return new BeagleBone::GPIO::Pin($PinIndexToNameList[$_[0]]);
 }
 
 =head1 AUTHOR
