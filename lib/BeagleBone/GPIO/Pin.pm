@@ -4,6 +4,7 @@ my $base='/sys/class/gpio/';
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
+use Carp;
 
 =head1 NAME
 
@@ -44,7 +45,7 @@ sub new {
 	      path=>$base.'gpio'.$index,
     };
     if(! -d $base.'gpio'.$index){
-        open(my $eh, '>', $base.'export') || die "Could not write to export device: $!\n";
+        open(my $eh, '>', $base.'export') || croak "Could not write to export device: $!\n";
         print $eh $index."\n";
         close($eh);
     }
@@ -58,7 +59,7 @@ sub new {
 sub setMode {
     my $me = shift;
     my $mode = shift;
-    open(my $dh, '>', $base.'gpio'.$index.'/direction') || die "Could not write to device direction controll handle: $!\n";
+    open(my $dh, '>', $base.'gpio'.$index.'/direction') || croak "Could not write to device direction controll handle: $!\n";
     print $dh $dir."\n";
     close($dh);
     return 1;
@@ -71,10 +72,22 @@ sub setMode {
 sub setValue{
     my $me = shift;
     my $value = shift;
-    open(my $vh, '>', $me->{path}.'/value') || die "Could not write to device value handle: $!\n";
+    open(my $vh, '>', $me->{path}.'/value') || croak "Could not write to device value handle: $!\n";
     print $vh $value."\n";
     close($vh);
     return 1;
+}
+
+=head2 getValue
+
+=cut
+
+sub getValue{
+    my $me = shift;
+    open(my $vh, '<', $me->{path}.'/value') || croak "Could not read from device value handle: $!\n";
+    my $value = <$vh>
+    close($vh);
+    return $value;
 }
 
 DESTROY{

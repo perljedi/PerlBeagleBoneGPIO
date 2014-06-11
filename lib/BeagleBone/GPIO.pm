@@ -33,6 +33,8 @@ Perhaps a little code snippet.
 
 =head1 EXPORT
 
+Note: None of the following are exported by default.  They are all available for export, and all of them can be imported at once through the convience export tag "all"
+
 =head2 Variables
 
 =head3 %PinNameMap
@@ -48,9 +50,9 @@ pin header names.
 
 =item L<&init|/init1>
 
-=item L<&getPinByName|getPinByName1>
+=item L<&getPinByName|/getPinByName1>
 
-=item L<&getPinByIndex|getPinByIndex>
+=item L<&getPinByIndex|/getPinByIndex1>
 
 =cut
 
@@ -91,11 +93,11 @@ sub getPinByName {
     return new BeagleBone::GPIO::Pin(@_);
 }
 
-=head2 getPinByName
+=head2 getPinByIndex
 
 =cut
 
-sub getPinByName {
+sub getPinByIndex {
     &init();
     return new BeagleBone::GPIO::Pin($PinIndexToNameList[$_[0]]);
 }
