@@ -38,10 +38,14 @@ Perhaps a little code snippet.
 sub new {
     my($proto, $name) = @_;
     my $index = BeageBone::GPIO::PinNameMap{$name};
-    my $me = {name=>$name, index=>$index};
+    my $me = {
+	      name=>$name, 
+	      index=>$index,
+	      path=>$base.'gpio'.$index,
+    };
     if(! -d $base.'gpio'.$index){
         open(my $eh, '>', $base.'export') || die "Could not write to export device: $!\n";
-        print $eh $index;
+        print $eh $index."\n";
         close($eh);
     }
     return bless($me, $proto);
@@ -55,9 +59,29 @@ sub setMode {
     my $me = shift;
     my $mode = shift;
     open(my $dh, '>', $base.'gpio'.$index.'/direction') || die "Could not write to device direction controll handle: $!\n";
-    print $dh $dir;
+    print $dh $dir."\n";
     close($dh);
     return 1;
+}
+
+=head2 setValue
+
+=cut
+
+sub setValue{
+    my $me = shift;
+    my $value = shift;
+    open(my $vh, '>', $me->{path}.'/value') || die "Could not write to device value handle: $!\n";
+    print $vh $value."\n";
+    close($vh);
+    return 1;
+}
+
+DESTROY{
+    my $me = shift;
+    open(my $uh, '>', $base.'unexport') || die "Could not un export used pin: $!\n";
+    print $uh $me->{index}."\n";
+    close(my $uh);
 }
 
 =head1 AUTHOR
