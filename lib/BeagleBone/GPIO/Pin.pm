@@ -37,8 +37,7 @@ Perhaps a little code snippet.
 =cut
 
 sub new {
-    my($proto, $name) = @_;
-    my $index = BeageBone::GPIO::PinNameMap{$name};
+    my($proto, $name, $index) = @_;
     my $me = {
 	      name=>$name, 
 	      index=>$index,
@@ -59,8 +58,8 @@ sub new {
 sub setMode {
     my $me = shift;
     my $mode = shift;
-    open(my $dh, '>', $base.'gpio'.$index.'/direction') || croak "Could not write to device direction controll handle: $!\n";
-    print $dh $dir."\n";
+    open(my $dh, '>', $me->{path}.'/direction') || croak "Could not write to device direction controll handle: $!\n";
+    print $dh $mode."\n";
     close($dh);
     return 1;
 }
@@ -85,7 +84,7 @@ sub setValue{
 sub getValue{
     my $me = shift;
     open(my $vh, '<', $me->{path}.'/value') || croak "Could not read from device value handle: $!\n";
-    my $value = <$vh>
+    my $value = <$vh>;
     close($vh);
     return $value;
 }
@@ -94,7 +93,7 @@ DESTROY{
     my $me = shift;
     open(my $uh, '>', $base.'unexport') || die "Could not un export used pin: $!\n";
     print $uh $me->{index}."\n";
-    close(my $uh);
+    close($uh);
 }
 
 =head1 AUTHOR

@@ -5,6 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 use vars qw(@EXPORT @EXPORT_OK %EXPORT_TAGS %PinNameMap @PinIndexToNameList);
+require BeagleBone::GPIO::Pin;
 
 =head1 NAME
 
@@ -50,9 +51,9 @@ pin header names.
 
 =item L<&init|/init1>
 
-=item L<&getPinByName|/getPinByName1>
+=item L<getPinByName|/getPinByName1>
 
-=item L<&getPinByIndex|/getPinByIndex1>
+=item L<getPinByIndex|/getPinByIndex1>
 
 =cut
 
@@ -90,7 +91,7 @@ sub init{
 
 sub getPinByName {
     &init();
-    return new BeagleBone::GPIO::Pin(@_);
+    return new BeagleBone::GPIO::Pin(@_, $PinNameMap{$_[0]});
 }
 
 =head2 getPinByIndex
@@ -100,6 +101,10 @@ sub getPinByName {
 sub getPinByIndex {
     &init();
     return new BeagleBone::GPIO::Pin($PinIndexToNameList[$_[0]]);
+}
+
+sub getPinIndex {
+    return PinNameMap{$_[0]};
 }
 
 =head1 AUTHOR
@@ -192,7 +197,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =cut
 
 return 42; # End of BeagleBone::GPIO
-__data__
+__DATA__
 P8_03 38
 P8_04 39
 P8_05 34
